@@ -350,6 +350,10 @@ let needSetup = false;
         response.redirect("https://github.com/louislam/uptime-kuma/wiki/Reset-Password-via-CLI");
     });
 
+    // Microsoft SSO Router
+    const microsoftAuthRouter = require("./routers/microsoft-auth-router");
+    app.use(microsoftAuthRouter);
+
     // API Router
     const apiRouter = require("./routers/api-router");
     app.use(apiRouter);
@@ -1531,6 +1535,42 @@ let needSetup = false;
                     ok: false,
                     msg: e.message,
                 });
+            }
+        });
+
+        socket.on("getMicrosoftSSOSettings", async (callback) => {
+            try {
+                checkLogin(socket);
+                const data = await Settings.get("microsoftSSO") || {};
+                callback({
+                    ok: true,
+                    data: {
+                        enabled: data.enabled || false,
+                        clientId: data.clientId || process.env.MICROSOFT_CLIENT_ID || "",
+                        tenantId: data.tenantId || process.env.MICROSOFT_TENANT_ID || "common",
+                        hasClientSecret: !!(data.clientSecret || process.env.MICROSOFT_CLIENT_SECRET),
+                        allowedDomains: data.allowedDomains || [],
+                    },
+                });
+            } catch (e) {
+                callback({ ok: false, msg: e.message });
+            }
+        });
+
+        socket.on("setMicrosoftSSOSettings", async (data, callback) => {
+            try {
+                checkLogin(socket);
+                const current = await Settings.get("microsoftSSO") || {};
+                await Settings.set("microsoftSSO", {
+                    enabled: !!data.enabled,
+                    clientId: data.clientId || "",
+                    tenantId: data.tenantId || "common",
+                    clientSecret: data.clientSecret || current.clientSecret || "",
+                    allowedDomains: Array.isArray(data.allowedDomains) ? data.allowedDomains : [],
+                });
+                callback({ ok: true, msg: "Saved" });
+            } catch (e) {
+                callback({ ok: false, msg: e.message });
             }
         });
 

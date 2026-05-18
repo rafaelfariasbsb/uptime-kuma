@@ -31,6 +31,7 @@ const Security = () => import("./components/settings/Security.vue");
 import Proxies from "./components/settings/Proxies.vue";
 import About from "./components/settings/About.vue";
 import RemoteBrowsers from "./components/settings/RemoteBrowsers.vue";
+import MicrosoftSSO from "./components/settings/MicrosoftSSO.vue";
 
 const routes = [
     {
@@ -134,6 +135,10 @@ const routes = [
                             {
                                 path: "about",
                                 component: About,
+                            },
+                            {
+                                path: "microsoft-sso",
+                                component: MicrosoftSSO,
                             },
                         ],
                     },

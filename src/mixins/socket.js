@@ -104,6 +104,23 @@ export default {
 
             this.socket.initedSocketIO = true;
 
+            // Handle Microsoft SSO redirect: pick up ssoToken / ssoError from URL params
+            const ssoParams = new URLSearchParams(window.location.search);
+            const ssoToken = ssoParams.get("ssoToken");
+            const ssoError = ssoParams.get("ssoError");
+            if (ssoToken || ssoError) {
+                ssoParams.delete("ssoToken");
+                ssoParams.delete("ssoError");
+                const cleanUrl = window.location.pathname + (ssoParams.toString() ? "?" + ssoParams.toString() : "");
+                window.history.replaceState({}, "", cleanUrl);
+                if (ssoToken) {
+                    this.storage().token = ssoToken;
+                }
+                if (ssoError) {
+                    toast.error(ssoError);
+                }
+            }
+
             let protocol = location.protocol + "//";
 
             let url;

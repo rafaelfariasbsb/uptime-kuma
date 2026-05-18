@@ -70,6 +70,21 @@
                     {{ $t(res.msg) }}
                 </div>
             </form>
+
+            <div v-if="microsoftSSOEnabled && !tokenRequired" class="mt-3">
+                <div class="separator">
+                    <span>{{ $t("or") }}</span>
+                </div>
+                <a href="/auth/microsoft" class="w-100 btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2 mt-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 21 21">
+                        <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+                        <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+                        <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+                        <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+                    </svg>
+                    {{ $t("Sign in with Microsoft") }}
+                </a>
+            </div>
         </div>
     </div>
 </template>
@@ -84,6 +99,7 @@ export default {
             token: "",
             res: null,
             tokenRequired: false,
+            microsoftSSOEnabled: false,
         };
     },
 
@@ -99,6 +115,7 @@ export default {
 
     mounted() {
         document.title += " - Login";
+        this.checkMicrosoftSSO();
     },
 
     unmounted() {
@@ -122,6 +139,16 @@ export default {
                     this.res = res;
                 }
             });
+        },
+
+        async checkMicrosoftSSO() {
+            try {
+                const res = await fetch("/auth/microsoft/enabled");
+                const data = await res.json();
+                this.microsoftSSOEnabled = data.enabled;
+            } catch (_e) {
+                this.microsoftSSOEnabled = false;
+            }
         },
     },
 };
@@ -151,5 +178,28 @@ export default {
     padding: 15px;
     margin: auto;
     text-align: center;
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #6c757d;
+    font-size: 0.85rem;
+
+    &::before,
+    &::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    &::before {
+        margin-right: 0.5em;
+    }
+
+    &::after {
+        margin-left: 0.5em;
+    }
 }
 </style>

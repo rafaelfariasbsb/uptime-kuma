@@ -121,6 +121,9 @@ export default {
                 about: {
                     title: this.$t("About"),
                 },
+                "microsoft-sso": {
+                    title: this.$t("Microsoft SSO"),
+                },
             };
         },
     },
